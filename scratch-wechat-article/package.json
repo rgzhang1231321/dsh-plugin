@@ -1,0 +1,20 @@
+{
+  "name": "dsh-wechat-article",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "User-level DSH plugin that runs a four-stage WeChat article pipeline (outline → draft → polish → titles) and persists drafts to local storage. Loaded as a scratch plugin via cordis.yml; the umbrella here only exists so pnpm can symlink workspace packages into this directory's node_modules.",
+  "dependencies": {
+    "@deepseek-ai/cordis": "workspace:*",
+    "@deepseek-ai/schemastery": "workspace:*",
+    "@deepseek-ai/dsh-settings": "workspace:*",
+    "@deepseek-ai/dsh-storage-domain": "workspace:*",
+    "@deepseek-ai/dsh-tools": "workspace:*",
+    "@deepseek-ai/dsh-llm": "workspace:*",
+    "@deepseek-ai/dsh-subagent": "workspace:*",
+    "@deepseek-ai/dsh-subagent-in-process-driver": "workspace:*",
+    "@deepseek-ai/dsh-agent": "workspace:*",
+    "@deepseek-ai/dsh-attachment": "workspace:*",
+    "zod": "^4.4.3"
+  }
+}

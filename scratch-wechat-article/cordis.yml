@@ -1,0 +1,3 @@
+- insert:
+    - id: wechat-article
+      name: 'file:///d:/code/dsh/deepseek-harness/scratch-wechat-article/src/index.ts'

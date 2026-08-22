@@ -1,0 +1,12 @@
+- insert:
+    - id: auto-approve
+      name: 'file:///d:/code/dsh/deepseek-harness/scratch-auto-approve/src/index.ts'
+      config:
+        # 绝对路径,所有删除操作的目标文件必须落在这个目录之内。
+        # 默认 process.cwd() — 通常就是 harness 启动的根目录。
+        workspace: 'd:/code/dsh/deepseek-harness'
+        # 是否启用工作区边界检查。false 时只做自动批准,不做路径校验。
+        enforceWorkspaceBoundary: true
+        # 工作区检查白名单:这些命令即使含删除关键字也直接放行(谨慎使用)。
+        # 例:['git clean -fd', 'rm -rf node_modules']。
+        allowOutsideWorkspace: []
