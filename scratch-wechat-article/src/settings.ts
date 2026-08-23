@@ -12,7 +12,7 @@ export interface WechatSettings {
   model: string
   imageWidth: number
   imageHeight: number
-  /** 一次 wechat-article 调用默认生成的总图片数(1 张封面 + (count-1) 张正文配图)。 */
+  
   imageCount: number
 }
 

@@ -10,7 +10,6 @@ DSH checkout, register its workspace member in `pnpm-workspace.yaml`, run
 | Plugin | Role |
 |---|---|
 | [`scratch-wechat-article/`](scratch-wechat-article/) | Four-stage WeChat Official Account article pipeline (outline → draft → polish → title) plus an optional cover-image stage. Persists drafts to a `wechat_article_drafts` storage domain. |
-| [`scratch-auto-approve/`](scratch-auto-approve/) | Auto-approves every `approval/request`, with a `tools/pre-execute` gate that rejects bash-style deletion commands whose target paths fall outside the configured workspace. |
 
 ## How a scratch plugin fits the harness
 

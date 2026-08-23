@@ -1,11 +1,4 @@
-/**
- * 流水线四个子代理各自的系统提示词。
- *
- * 每段 persona 都短而指令性强 — 模型通过 `SubagentStartRequest` 的 `persona`
- * 字段拿到完整提示词,进程内驱动会把它以 `deployment:persona` section 的形式
- * 装到子代理上,覆盖部署级别的 persona。下面这些阶段化指令告诉每个子代理它
- * 应该收到什么输入、输出什么形状、遵守哪些约束。
- */
+
 
 export const OUTLINE_PERSONA = [
   'You are the outline stage of a WeChat article pipeline.',

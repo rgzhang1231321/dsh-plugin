@@ -3,11 +3,7 @@ import { defineDomain, domainTable } from '@deepseek-ai/dsh-storage-domain'
 import z from 'zod'
 import type { DraftRow } from './types'
 
-/**
- * 插件持久化状态的 domain 声明。一张表保存所有文章草稿,key 是字符串
- * (插入时取毫秒时间戳转字符串)。storage host 从部署配置中选择后端
- * (JSONL 或 SQLite);本插件只接触类型化的 `KvTable` 表面。
- */
+
 export const draftsSpec = defineDomain({
   name: 'wechat_article_drafts',
   version: 1,

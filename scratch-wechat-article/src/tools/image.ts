@@ -1,7 +1,4 @@
-/**
- * `wechat-image` 工具:给定一段画面描述,调用 Pollinations.ai 生成插图/封面,
- * 存一份到会话工作区 `wechat-images/`,并作为附件挂进对话,让 GUI 直接渲染。
- */
+
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import type { ImageAttachmentRef } from '@deepseek-ai/dsh-attachment'
@@ -12,13 +9,13 @@ interface ImageToolArgs {
   width?: number
   height?: number
   seed?: number
-  /** 保存子目录名,用于区分封面/插图等用途。 */
+  
   tag?: string
 }
 
 interface ImageToolResult {
   path: string
-  /** 会话内渲染用的附件引用(纯 JSON,可序列化)。 */
+  
   attachment?: ImageAttachmentRef
   prompt: string
   seed?: number
@@ -90,8 +87,8 @@ export function registerImageTool(ctx: Context): void {
           ].filter(line => line !== '').join('\n'),
         }]
         if (value.attachment !== undefined) {
-          // schema 推断出的附件形状与 AttachmentId 的 branded 类型只差一层,
-          // 运行时就是同一个对象,这里做一次窄化转换以便挂进会话。
+          
+          
           blocks.push({ type: 'image', attachment: value.attachment as unknown as ImageAttachmentRef })
         }
         return blocks

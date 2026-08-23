@@ -17,11 +17,7 @@ import type { DraftRow, InlineImageRow } from '../types'
 import type { WechatSettings, Style } from '../settings'
 import { generateImage, saveImageToWorkspace } from '../image'
 
-/**
- * 把 SubagentResult 输出里所有 text block 拼成一个字符串。reasoning / tool-call /
- * image 类型的 block 被跳过 — persona 提示词里已经明确要求只输出纯文本,
- * 这里出现非文本 block 说明子代理违反了契约。
- */
+
 function outputText(blocks: readonly ContentBlock[]): string {
   const parts: string[] = []
   for (const block of blocks) {
@@ -30,32 +26,29 @@ function outputText(blocks: readonly ContentBlock[]): string {
   return parts.join('')
 }
 
-/** 把标题阶段返回的多行文本拆成 trim 后的非空行。 */
+
 function parseTitleLines(raw: string): string[] {
   return raw
     .split(/\r?\n/)
     .map(line => line.trim())
     .filter(line => line.length > 0)
-    .map(line => line.replace(/^[\d.\-)、\s]+/, '')) // 去掉开头的列表编号
+    .map(line => line.replace(/^[\d.\-)、\s]+/, '')) 
     .filter(line => line.length > 0)
 }
 
-/**
- * `wechat-inline-images` 子代理承诺输出单行 JSON。
- * 解析失败时返回 null —— 调用方决定是否抛错或回退。
- */
+
 interface SceneSpec {
   name: string
   anchor: string
   prompt: string
 }
 function parseSceneList(raw: string): SceneSpec[] | null {
-  // 子代理偶尔会包一层 Markdown code fence 或在 JSON 前后留白; 先剥掉常见的包装。
+  
   const stripped = raw
     .replace(/^```(?:json)?\s*/i, '')
     .replace(/```\s*$/i, '')
     .trim()
-  // 找到第一个 '{' 到最后一个 '}' 之间的内容,容错。
+  
   const first = stripped.indexOf('{')
   const last = stripped.lastIndexOf('}')
   if (first === -1 || last === -1 || last <= first) return null
@@ -83,10 +76,7 @@ function parseSceneList(raw: string): SceneSpec[] | null {
   }
 }
 
-/**
- * 一次性前台委派一个子代理并收集它的最终文本输出。无论结果如何都 dispose,
- * 让子代理在下一阶段开始前一定进入 quiescence 状态。
- */
+
 async function runStage(
   ctx: Context,
   parent: Agent,
@@ -116,13 +106,13 @@ interface ArticleToolArgs {
   readonly topic: string
   readonly style?: Style
   readonly targetLength?: number
-  /** 为 true 时在标题阶段后自动生成 1 张封面图 + (imageCount-1) 张正文配图。 */
+  
   readonly generateCover?: boolean
-  /** 覆盖 settings.imageCount: 一次调用总共要生成的图片数(1 张封面 + count-1 张正文)。 */
+  
   readonly imageCount?: number
 }
 
-/** 工具结果中的正文配图形态 — 附件引用和路径都要返回,便于 GUI 渲染与用户复用。 */
+
 interface InlineImageResult {
   name: string
   anchor: string
@@ -138,13 +128,13 @@ interface ArticleToolResult {
   titles: string[]
   style: Style
   targetLength: number
-  /** 工具为本次调用实际生成的总图片数(封面 + 正文)。 */
+  
   imageCount: number
   coverPrompt?: string
   coverPath?: string
-  /** 封面图的附件引用,供 render 直接挂进会话。 */
+  
   coverAttachment?: ImageAttachmentRef
-  /** 正文配图(场景 + 附件引用),按文章中位置顺序。 */
+  
   inlineImages?: InlineImageResult[]
 }
 
@@ -275,8 +265,8 @@ export function registerArticleTool(
           ].filter(line => line !== '').join('\n'),
         }]
         if (value.coverAttachment !== undefined) {
-          // schema 推断出的附件形状与 AttachmentId 的 branded 类型只差一层,
-          // 运行时就是同一个对象,这里做一次窄化转换以便挂进会话。
+          
+          
           blocks.push({ type: 'image', attachment: value.coverAttachment as unknown as ImageAttachmentRef })
         }
         if (value.inlineImages !== undefined) {
@@ -294,7 +284,7 @@ export function registerArticleTool(
       const base = scope.get()
       const style: Style = args.style ?? base.style
       const targetLength = args.targetLength ?? base.targetLength
-      // 默认 imageCount=3 (1 封面 + 2 正文),范围 1..6。
+      
       const requestedCount = args.imageCount ?? base.imageCount
       const imageCount = Math.max(1, Math.min(6, Math.floor(requestedCount)))
       const inlineCount = imageCount - 1
@@ -327,11 +317,11 @@ export function registerArticleTool(
         throw new Error('title stage produced no usable title lines')
       }
 
-      // 可选的第五阶段: 封面图(标题级)。
+      
       let coverPrompt: string | undefined
       let coverPath: string | undefined
       let coverAttachment: ImageAttachmentRef | null = null
-      // 可选的第六阶段: 正文配图(场景级, 由子代理挑选与文章强相关的位置)。
+      
       let inlineImages: InlineImageResult[] = []
       let inlineImagesForRow: InlineImageRow[] = []
 
@@ -342,7 +332,7 @@ export function registerArticleTool(
         }
         const attachments = ctx.get('attachments')
 
-        // 封面。
+        
         const coverPromptRaw = await runStage(
           ctx, exec.agent, exec.signal,
           'wechat-cover', COVER_PERSONA,
@@ -370,8 +360,8 @@ export function registerArticleTool(
           })
         }
 
-        // 正文配图 — 由 wechat-inline-images 子代理挑选位置并写英文提示词,
-        // 然后并发调出图服务。相关性由子代理的 persona 强约束(必须引用文章中的具体细节)。
+        
+        
         if (inlineCount > 0) {
           const scenesRaw = await runStage(
             ctx, exec.agent, exec.signal,
@@ -393,22 +383,22 @@ export function registerArticleTool(
           )
           const scenes = parseSceneList(scenesRaw)
           if (scenes === null) {
-            // JSON 解析失败, 抛出以便用户看到; 不会写出半截图。
+            
             throw new Error(`wechat-inline-images returned invalid JSON: ${scenesRaw.slice(0, 200)}`)
           }
-          // 截到用户要求的数量; 子代理可能多给。
+          
           const chosen = scenes.slice(0, inlineCount)
           if (chosen.length === 0) {
             throw new Error('wechat-inline-images returned no usable scenes')
           }
 
-          // 串行出图 + 间隔, 避免 Pollinations 限流;
-          // 重试/退避由 generateImage 内部处理。单张失败直接抛错让用户看到。
+          
+          
           const flat: { row: InlineImageRow, resultEntry: InlineImageResult }[] = []
           for (let i = 0; i < chosen.length; i++) {
             const scene = chosen[i]!
             if (i > 0) {
-              // 串行间隙 1.5s, 让上游限流窗口过去。
+              
               await new Promise<void>(resolve => setTimeout(resolve, 1500))
             }
             const gen = await generateImage({
@@ -434,7 +424,7 @@ export function registerArticleTool(
               })
             }
             if (attachment === null) {
-              // 附件服务不可用,跳过这张图。
+              
               continue
             }
             flat.push({

@@ -2,10 +2,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import type { SettingsScope } from '@deepseek-ai/dsh-settings'
 import type { WechatSettings, Style, Tone } from './settings'
 
-/**
- * 每种风格的写作指引。短而明确 — 模型本来就会写东西,这里只是给出编辑框架,
- * 让四个子代理和任何直接生成正文的调用都保持一致。
- */
+
 const STYLE_GUIDANCE: Record<Style, string> = {
   'deep-analysis': '结构化深度分析：每段先立论再举证，结尾给可执行建议。',
   'storytelling': '叙事化写法：开头用冲突/场景钩子，主体推进情节，结尾收束情绪。',
@@ -18,12 +15,7 @@ const TONE_GUIDANCE: Record<Tone, string> = {
   casual: '轻快、句子短促，允许表情符号和网络流行语。',
 }
 
-/**
- * 注册一个 system-prompt section,每次组装 prompt 时从 `wechat-article` settings
- * 命名空间重新读取当前的 style/tone。`text` 回调闭包持有 scope,因此 section
- * 会自动反映用户对 settings 的修改,无需显式反订阅;prompt 组装服务会在
- * 每次 `system-prompt/change` 事件时重新求值回调。
- */
+
 export function registerStyleSection(
   ctx: Context,
   scope: SettingsScope<WechatSettings>,
