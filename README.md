@@ -10,6 +10,7 @@ DSH checkout, register its workspace member in `pnpm-workspace.yaml`, run
 | Plugin | Role |
 |---|---|
 | [`scratch-wechat-article/`](scratch-wechat-article/) | Four-stage WeChat Official Account article pipeline (outline → draft → polish → title) plus an optional cover-image stage. Persists drafts to a `wechat_article_drafts` storage domain. |
+| [`scratch-image-gen/`](scratch-image-gen/) | Multi-provider image generation tool (`image-gen`) wrapping OpenAI (`gpt-image-1` / `dall-e-3`), Aliyun DashScope (Bailian, async), and MiniMax (`image-01`). Supports text-to-image and image-to-image; provider + key configured per-provider in settings or via a local JSON file. |
 
 ## How a scratch plugin fits the harness
 
@@ -42,7 +43,7 @@ with an `insert` block ready to use.
 cd path/to/deepseek-harness
 pnpm dsh web \
   --patch ./scratch-wechat-article/cordis.yml \
-  --patch ./scratch-auto-approve/cordis.yml
+  --patch ./scratch-image-gen/cordis.yml
 ```
 
 ### Persistent load
@@ -57,12 +58,8 @@ need no `--patch` and live edits apply without restart.
     - id: wechat-article
       name: 'file:///ABSOLUTE/PATH/TO/scratch-wechat-article/src/index.ts'
 - insert:
-    - id: auto-approve
-      name: 'file:///ABSOLUTE/PATH/TO/scratch-auto-approve/src/index.ts'
-      config:
-        workspace: '/ABSOLUTE/PATH/TO/YOUR/WORKSPACE'
-        enforceWorkspaceBoundary: true
-        allowOutsideWorkspace: []
+    - id: image-gen
+      name: 'file:///ABSOLUTE/PATH/TO/scratch-image-gen/src/index.ts'
 ```
 
 > The `name:` field MUST be a `file://` URL — on Windows, raw `d:/...`
@@ -85,6 +82,11 @@ expression that derives the URL from the harness's `process.cwd()`:
       name: !!js |
         new URL('scratch-wechat-article/src/index.ts',
                 'file://' + process.cwd().replace(/\\/g, '/') + '/').href
+- insert:
+    - id: image-gen
+      name: !!js |
+        new URL('scratch-image-gen/src/index.ts',
+                'file://' + process.cwd().replace(/\\/g, '/') + '/').href
 ```
 
 YAML has no variables, so the `!!js` form is the only way to keep a
@@ -106,7 +108,7 @@ type checking for an individual plugin from the harness root:
 
 ```sh
 npx tsc --noEmit -p scratch-wechat-article/tsconfig.json
-npx tsc --noEmit -p scratch-auto-approve/tsconfig.json
+npx tsc --noEmit -p scratch-image-gen/tsconfig.json
 ```
 
 Errors in `vendor/cordis/` and `vendor/schemastery/` are pre-existing
@@ -114,7 +116,7 @@ framework issues and are not caused by these plugins.
 
 ## Plugin development
 
-Both plugins were developed as scratch plugins — for the design
+These plugins were developed as scratch plugins — for the design
 constraints and the rationale behind the workspace-member pattern,
 see the `dsh` docs in the harness repository (in particular
 `docs/user/develop/basic/index.zh.md`).

@@ -1,0 +1,3 @@
+- insert:
+    - id: image-gen
+      name: 'file:///d:/code/dsh/deepseek-harness/scratch-image-gen/src/index.ts'
