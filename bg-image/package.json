@@ -1,0 +1,13 @@
+{
+  "name": "dsh-bg-image",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "User-level DSH plugin that sets a configurable background image on the Web UI body, with manual image cycling via a floating button.",
+  "dependencies": {
+    "@deepseek-ai/cordis": "workspace:*",
+    "@deepseek-ai/schemastery": "workspace:*",
+    "@deepseek-ai/dsh-host-webserver": "workspace:*",
+    "@deepseek-ai/dsh-settings": "workspace:*"
+  }
+}

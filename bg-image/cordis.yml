@@ -1,0 +1,3 @@
+- insert:
+    - id: bg-image
+      name: 'file:///d:/code/dsh/deepseek-harness/dsh_plugin/bg-image/src/index.ts'
